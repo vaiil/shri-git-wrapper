@@ -1,6 +1,6 @@
-const git = require('../index')
+const Git = require('../index')
 
-git
+Git
   .downloadRepository('https://github.com/hanford/await-exec', '/js-test-dir')
   .then()
   .catch((error) => console.log(error))

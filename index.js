@@ -1,38 +1,29 @@
 const fs = require('fs')
 const path = require('path')
-const { exec } = require('child_process')
+const exec = require('await-exec')
 
 class Git {
   constructor (pathToRepo) {
     this.path = path.resolve(pathToRepo)
   }
 
-  static downloadRepository (url, pathToParent, repoDirName) {
-    return new Promise((resolve, reject) => {
-      const parentDirectory = path.resolve(pathToParent)
-      if (!fs.existsSync(pathToParent)) {
-        reject(`Cannot open dir ${parentDirectory}`)
-        return
-      }
-      let cmd = `git clone ${url}`
-      if (repoDirName) {
-        cmd += ' ' + repoDirName
-      }
+  async static downloadRepository (url, pathToParent, repoName) {
+    const parentDirectory = path.resolve(pathToParent)
 
-      exec(
-        cmd, {
-          cwd: parentDirectory
-        },
-        (error, stdout, stderr) => {
-          if (error) {
-            reject(error, stdout, stderr)
-            return
-          }
-          resolve(stdout, stderr)
+    if (!fs.existsSync(pathToParent)) {
+      throw 'Cannot open directory'
+    }
 
-        }
-      )
-    })
+    let cmd = `git clone -q ${url} ${repoName}`
+
+
+    await exec(
+      cmd, {
+        cwd: parentDirectory
+      }
+    )
+
+    return new self(path.resolve(parentDirectory, repoName))
   }
 }
 
