@@ -1,1 +1,1 @@
-Node.js wrapper for git
+Hello world!
