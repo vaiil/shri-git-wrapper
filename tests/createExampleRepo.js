@@ -10,7 +10,7 @@ module.exports = async (callback) => {
       cwd: tmpDir.path
     })
 
-    await callback(tmpDir.paht)
+    await callback(tmpDir.path)
 
   } catch (e) {
     // Clear dir anyway
