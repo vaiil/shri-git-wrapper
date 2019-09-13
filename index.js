@@ -31,7 +31,7 @@ class Git {
   }
 
   async getDiff (commit = 'HEAD') {
-    const result = await exec('git diff ' + commit, this.processOptions)
+    const result = await exec(`git diff ${commit}`, this.processOptions)
     return result.stdout
   }
 
@@ -39,8 +39,9 @@ class Git {
     return spawn('git', ['show', commit + ':' + path], this.processOptions)
   }
 
-  async scanDir ({ path = '/', commit = 'HEAD' }) {
-
+  async scanDir ({ path = '.', commit = 'HEAD' }) {
+    const result = await exec(`git ls-files ${commit} ${path}`, this.processOptions)
+    return result.stdout
   }
 
   delete () {
