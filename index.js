@@ -1,15 +1,19 @@
 const fs = require('fs')
 const path = require('path')
 const exec = require('await-exec')
-// const spawn = require('child_process').spawn
+const spawn = require('child_process').spawn
+const rimraf = require('rimraf')
 
 class Git {
   constructor (pathToRepo) {
     this.path = path.resolve(pathToRepo)
+    this.processOptions = {
+      cwd: pathToRepo
+    }
   }
 
   async getCommits (startCommit = 'HEAD') {
-    const data = await exec('git rev-list --oneline --timestamp ' + startCommit)
+    const data = await exec('git rev-list --oneline --timestamp ' + startCommit, this.processOptions)
 
     return data.stdout.split(/\r?\n/)
       .map(line => {
@@ -27,13 +31,23 @@ class Git {
   }
 
   async getDiff (commit = 'HEAD') {
-    const result = await exec('git diff ' + commit)
+    const result = await exec('git diff ' + commit, this.processOptions)
     return result.stdout
   }
 
-  // readBlob (handler, path, commit = 'HEAD') {
-  //   spawn('git', ['show', ]
-  // }
+  getBlobReader (path, commit = 'HEAD') {
+    return spawn('git', ['show', commit + ':' + path], this.processOptions)
+  }
+
+  async scanDir ({ path = '/', commit = 'HEAD' }) {
+
+  }
+
+  delete () {
+    return new Promise(resolve => {
+      rimraf(this.path, resolve)
+    })
+  }
 
   static async downloadRepository (url, pathToParent, repoName) {
     const parentDirectory = path.resolve(pathToParent)
