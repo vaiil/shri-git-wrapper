@@ -3,6 +3,7 @@ const path = require('path')
 const exec = require('await-exec')
 const spawn = require('child_process').spawn
 const rimraf = require('rimraf')
+const util = require('util')
 
 class Git {
   constructor (pathToRepo) {
@@ -44,10 +45,8 @@ class Git {
     return result.stdout
   }
 
-  delete () {
-    return new Promise(resolve => {
-      rimraf(this.path, resolve)
-    })
+  async delete () {
+    await util.promisify(rimraf)(this.path)
   }
 
   static async downloadRepository (url, pathToParent, repoName) {
@@ -57,15 +56,41 @@ class Git {
       throw 'Cannot open directory'
     }
 
-    let cmd = `git clone -q ${url} ${repoName}`
+    await exec(`git clone -q ${url} ${repoName}`, {
+      cwd: parentDirectory
+    })
+    // const cloneProcess = spawn(
+    //   'git', ['clone', '-q', url, repoName], {
+    //     cwd: parentDirectory
+    //   }
+    // )
 
-    await exec(
-      cmd, {
-        cwd: parentDirectory
-      }
-    )
+    // const wait = () => new Promise((resolve, reject) => {
+    //   cloneProcess.stdout.on('data', (data) => {
+    //     if (data) {
+    //       reject(new Error(data.toString()))
+    //       cloneProcess.kill('SIGTERM')
+    //     }
+    //   })
+    //
+    //   cloneProcess.stdin.on('data', (data) => {
+    //     console.log(data)
+    //   })
+    //
+    //   cloneProcess.stderr.on('data', (data) => {
+    //     if (data) {
+    //       reject(new Error(data.toString()))
+    //     }
+    //   })
+    //
+    //   cloneProcess.on('close', () => {
+    //     resolve()
+    //   })
+    // })
+    //
+    // await wait()
 
-    return new self(path.resolve(parentDirectory, repoName))
+    return new this(path.resolve(parentDirectory, repoName))
   }
 }
 

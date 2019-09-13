@@ -1,1 +1,1 @@
-Hello world!
+Node.js Обертка для Git
