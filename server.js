@@ -1,7 +1,5 @@
 const express = require('express')
-const fs = require('fs')
-const path = require('path')
-const util = require('util')
+const getDirs = require('./get-dirs')
 require('dotenv').config()
 
 const app = express()
@@ -21,9 +19,11 @@ app.get(
   '/api/repos',
   jsonProxyRequest(
     async () => {
-      return await util.promisify(fs.readdir)(path.resolve(process.env.GIT_REPO_DIR))
+      return await getDirs(process.env.GIT_REPO_DIR)
     }
   )
 )
+
+app.get
 
 app.listen(3000)

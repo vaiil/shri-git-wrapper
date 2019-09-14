@@ -60,7 +60,7 @@ class Git {
     const parentDirectory = path.resolve(pathToParent)
 
     if (!fs.existsSync(pathToParent)) {
-      throw 'Cannot open directory'
+      throw new Error('Cannot open directory')
     }
 
     await exec(`git clone -q ${url} ${repoName}`, {

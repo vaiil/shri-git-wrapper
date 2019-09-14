@@ -1,5 +1,6 @@
 const Git = require('../git')
 const dir = require('tmp-promise').dir
+const getDirs = require('../get-dirs')
 
 async function downloadThisRepo (parentDir) {
   return await Git.downloadRepository('git@github.com:vaiil/shri-git-wrapper.git', parentDir, 'test')
@@ -16,6 +17,10 @@ describe('downloadRepository', () => {
     await expect(downloadThisRepo(tmpDir.path)).rejects.toThrow()
 
     await tmpDir.cleanup()
+  })
+
+  it('non-existing dir', async () => {
+    await expect(downloadThisRepo('/non-existing-path')).rejects.toThrow()
   })
 })
 
@@ -157,6 +162,26 @@ describe('scanDir', () => {
     })
 
     expect(items).toEqual(['git.test.js'])
+
+    await tmpDir.cleanup()
+  })
+})
+
+describe('delete', () => {
+  it('Download and delete', async () => {
+    const tmpDir = await dir({ unsafeCleanup: true })
+
+    const repo = await downloadThisRepo(tmpDir.path)
+
+    let items = await getDirs(tmpDir.path)
+
+    expect(items).toEqual(['test'])
+
+    await repo.delete()
+
+    items = await getDirs(tmpDir.path)
+
+    expect(items).toEqual([])
 
     await tmpDir.cleanup()
   })
