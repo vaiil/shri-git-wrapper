@@ -33,7 +33,7 @@ class Git {
 
   async getDiff (commit = 'HEAD') {
     const result = await exec(`git --no-pager show ${commit}`, this.processOptions)
-    return result.stdout
+    return result.stdout.toString()
   }
 
   getBlobReader (path, commit = 'HEAD') {
@@ -42,7 +42,7 @@ class Git {
 
   async scanDir ({ path = '.', commit = 'HEAD' }) {
     const result = await exec(`git ls-files ${commit} ${path}`, this.processOptions)
-    return result.stdout
+    return result.stdout.split(/\r?\n/)
   }
 
   async delete () {

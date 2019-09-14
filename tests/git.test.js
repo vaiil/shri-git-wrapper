@@ -1,4 +1,4 @@
-const Git = require('../index')
+const Git = require('../git')
 const dir = require('tmp-promise').dir
 
 async function downloadThisRepo (parentDir) {
@@ -17,15 +17,6 @@ describe('downloadRepository', () => {
 
     await tmpDir.cleanup()
   })
-
-  // test('download non-existing repo', async () => {
-  //   const tmpDir = await dir({ unsafeCleanup: true })
-  //
-  //   await expect(Git.downloadRepository('git@github.com:vaiil/Ive-not-created-this.git', tmpDir.path, 'test')).rejects.toThrow()
-  //   await expect(Git.downloadRepository('https://github.com/some-user/I-hope-he-wont-create-this-repo.git', tmpDir.path, 'test')).rejects.toThrow()
-  //
-  //   await tmpDir.cleanup()
-  // })
 })
 
 describe('getCommits', () => {
@@ -48,7 +39,7 @@ describe('getCommits', () => {
     }
   ]
 
-  it('Get this repo second commit', async () => {
+  it('This repo - second commit', async () => {
     const tmpDir = await dir({ unsafeCleanup: true })
 
     const repo = await downloadThisRepo(tmpDir.path)
@@ -61,7 +52,7 @@ describe('getCommits', () => {
     await tmpDir.cleanup()
   })
 
-  it('Get master branch of this repo', async () => {
+  it('This repo - master', async () => {
     const tmpDir = await dir({ unsafeCleanup: true })
 
     const repo = await downloadThisRepo(tmpDir.path)
@@ -74,7 +65,7 @@ describe('getCommits', () => {
     await tmpDir.cleanup()
   })
 
-  it('Get long history commits', async () => {
+  it('Large repo', async () => {
     const tmpDir = await dir({ unsafeCleanup: true })
 
     const repo = await Git.downloadRepository('git@github.com:vuejs/vue.git', tmpDir.path, 'vue')
@@ -96,3 +87,60 @@ describe('getCommits', () => {
     await tmpDir.cleanup()
   })
 })
+
+describe('getDiff', () => {
+  it('This repo', async () => {
+    const tmpDir = await dir({ unsafeCleanup: true })
+
+    const repo = await downloadThisRepo(tmpDir.path)
+
+    // It shouldn't fail
+    expect(typeof await repo.getDiff('975f365')).toEqual('string') // Get second commit
+    expect(typeof await repo.getDiff('812dcf0')).toEqual('string') // Get first commit
+    expect(typeof await repo.getDiff()).toEqual('string') // Try get diff of HEAD commit
+    expect(typeof await repo.getDiff('master')).toEqual('string') // Try get diff of master
+
+    await tmpDir.cleanup()
+  })
+
+  it('Error testing', async () => {
+    const tmpDir = await dir({ unsafeCleanup: true })
+
+    const repo = await downloadThisRepo(tmpDir.path)
+
+    await expect(repo.getDiff('wrong-branch')).rejects.toThrow() // Wrong branch
+    await expect(repo.getDiff('4')).rejects.toThrow() // Ambiguous ref
+
+    await tmpDir.cleanup()
+  })
+})
+
+describe('getBlobReader', () => {
+  it('This repo - README', async () => {
+    const tmpDir = await dir({ unsafeCleanup: true })
+
+    const repo = await downloadThisRepo(tmpDir.path)
+
+    const blobReader = repo.getBlobReader('README.md', '812dcf0')
+
+    const wait = () => new Promise(
+      resolve => {
+        let message = ''
+        blobReader.stdout.on('data', msg => {
+          message += msg
+        })
+        blobReader.on('close', () => resolve(message))
+      }
+    )
+
+    const readme = await wait()
+
+    expect(readme).toEqual('Node.js wrapper for git')
+
+    await tmpDir.cleanup()
+  })
+})
+//
+// describe('scanDir', () => {
+//   it('')
+// })
