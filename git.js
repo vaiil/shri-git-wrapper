@@ -5,8 +5,6 @@ const spawn = require('child_process').spawn
 const rimraf = require('rimraf')
 const util = require('util')
 
-
-
 class Git {
   constructor (pathToRepo) {
     this.path = path.resolve(pathToRepo)
@@ -15,8 +13,16 @@ class Git {
     }
   }
 
-  async getCommits (startCommit = 'master') {
-    const data = await exec('git rev-list --oneline --timestamp ' + startCommit, this.processOptions)
+  async getCommits (startCommit = 'master', limit = null) {
+    let cmd
+
+    if (limit) {
+      cmd = `git rev-list --oneline --timestamp --max-count=${limit} ${startCommit}`
+    } else {
+      cmd = `git rev-list --oneline --timestamp ${startCommit}`
+    }
+
+    const data = await exec(cmd, this.processOptions)
 
     return data.stdout.split(/\r?\n/)
       .map(line => {

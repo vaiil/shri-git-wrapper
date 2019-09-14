@@ -49,7 +49,7 @@ app.use('/api/repos/:repo', (req, res, next) => {
 })
 
 app.get(
-  '/api/repos/:repo/commits/:commit',
+  '/api/repos/:repo/commits/:commit?',
   jsonProxyRequest(async (req) => await req.repo.getCommits(req.params.commit))
 )
 
@@ -74,6 +74,30 @@ app.get(
     })
     blobReader.on('close', () => res.end())
   }
+)
+
+app.get(
+  '/api/repos/:repo/paginate-commits/:limit/:commit?',
+  jsonProxyRequest(async (req) => {
+    const limit = parseInt(req.params.limit)
+    const items = await req.repo.getCommits(req.params.commit, limit + 1)
+    const lastItem = items.pop()
+    if (items.length === limit) {
+      let url = req.protocol
+        + '://'
+        + req.get('host')
+        + `/api/repos/${req.params.repo}/paginate-commits/${req.params.limit}/${lastItem.ref}`
+      return {
+        items: items,
+        next: url
+      }
+    } else {
+      return {
+        items: items,
+        next: null
+      }
+    }
+  })
 )
 
 app.delete(
