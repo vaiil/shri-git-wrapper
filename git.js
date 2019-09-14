@@ -40,9 +40,16 @@ class Git {
     return spawn('git', ['show', commit + ':' + path], this.processOptions)
   }
 
-  async scanDir ({ path = '.', commit = 'HEAD' }) {
-    const result = await exec(`git ls-files ${commit} ${path}`, this.processOptions)
-    return result.stdout.split(/\r?\n/)
+  async scanDir ({ path: directory = '', commit = 'HEAD' }) {
+    let dir = directory
+    if (dir && !dir.endsWith('/')) {
+      dir += '/'
+    }
+    const result = await exec(`git ls-tree --name-only ${commit} ${dir}`, this.processOptions)
+    return result.stdout
+      .split(/\r?\n/)
+      .filter(v => v !== '')
+      .map(file => path.basename(file))
   }
 
   async delete () {

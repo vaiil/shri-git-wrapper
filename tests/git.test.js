@@ -140,7 +140,24 @@ describe('getBlobReader', () => {
     await tmpDir.cleanup()
   })
 })
-//
-// describe('scanDir', () => {
-//   it('')
-// })
+
+describe('scanDir', () => {
+  it('This repo', async () => {
+    const tmpDir = await dir({ unsafeCleanup: true })
+
+    const repo = await downloadThisRepo(tmpDir.path)
+
+    let items = await repo.scanDir({ commit: '812dcf0' })
+
+    expect(items).toEqual(['README.md'])
+
+    items = await repo.scanDir({
+      commit: '8b6b3cc',
+      path: 'tests'
+    })
+
+    expect(items).toEqual(['git.test.js'])
+
+    await tmpDir.cleanup()
+  })
+})
