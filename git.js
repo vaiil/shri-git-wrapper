@@ -5,6 +5,8 @@ const spawn = require('child_process').spawn
 const rimraf = require('rimraf')
 const util = require('util')
 
+
+
 class Git {
   constructor (pathToRepo) {
     this.path = path.resolve(pathToRepo)
@@ -13,7 +15,7 @@ class Git {
     }
   }
 
-  async getCommits (startCommit = 'HEAD') {
+  async getCommits (startCommit = 'master') {
     const data = await exec('git rev-list --oneline --timestamp ' + startCommit, this.processOptions)
 
     return data.stdout.split(/\r?\n/)
@@ -31,16 +33,16 @@ class Git {
       .filter(v => v !== null)
   }
 
-  async getDiff (commit = 'HEAD') {
+  async getDiff (commit = 'master') {
     const result = await exec(`git --no-pager show ${commit}`, this.processOptions)
     return result.stdout.toString()
   }
 
-  getBlobReader (path, commit = 'HEAD') {
+  getBlobReader (path, commit = 'master') {
     return spawn('git', ['show', commit + ':' + path], this.processOptions)
   }
 
-  async scanDir ({ path: directory = '', commit = 'HEAD' }) {
+  async scanDir ({ path: directory = '', commit = 'master' }) {
     let dir = directory
     if (dir && !dir.endsWith('/')) {
       dir += '/'
