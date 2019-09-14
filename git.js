@@ -64,6 +64,28 @@ class Git {
     await util.promisify(rimraf)(this.path)
   }
 
+  stat (commit = 'master') {
+    const ls = spawn('git', ['--no-pager', 'ls-tree', '--name-only', '-r', commit], this.processOptions)
+    const cat = spawn('xargs', ['-I', '{}', 'git', '--no-pager', 'show', `${commit}:{}`], this.processOptions)
+    ls.stdout.pipe(cat.stdin)
+    const stats = {}
+    return new Promise((resolve, reject) => {
+      cat.stdout.on('data', buffer => {
+        let str = buffer.toString()
+        if (str) {
+          for (let char of str) {
+            if (!stats[char]) {
+              stats[char] = 0
+            }
+            stats[char]++
+          }
+        }
+      })
+      cat.stderr.on('data', (data) => reject(data.toString()))
+      cat.on('close', () => resolve(stats))
+    })
+  }
+
   static async downloadRepository (url, pathToParent, repoName) {
     const parentDirectory = path.resolve(pathToParent)
 

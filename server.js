@@ -110,6 +110,12 @@ app.get(
   })
 )
 
+
+app.get(
+  '/api/repos/:repo/stat/:commit?',
+  jsonProxyRequest(async (req) => await req.repo.stat(req.params.commit))
+)
+
 app.delete(
   '/api/repos/:repo',
   jsonProxyRequest(async (req) => await req.repo.delete())
