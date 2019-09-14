@@ -32,7 +32,7 @@ class Git {
   }
 
   async getDiff (commit = 'HEAD') {
-    const result = await exec(`git diff ${commit}`, this.processOptions)
+    const result = await exec(`git --no-pager show ${commit}`, this.processOptions)
     return result.stdout
   }
 
