@@ -1,11 +1,21 @@
 const express = require('express')
 const path = require('path')
+const minimist = require('minimist')
 const getDirs = require('./get-dirs')
 
 require('dotenv').config()
 const Git = require('./git')
 
-const reposDir = process.env.GIT_REPO_DIR
+let reposDir = process.env.GIT_REPO_DIR
+
+const argv = minimist(process.argv)
+if (argv.path) {
+  reposDir = argv.path
+}
+
+reposDir = path.resolve(reposDir)
+
+console.log('Repos dir: ' + reposDir)
 
 const app = express()
 
