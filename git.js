@@ -65,8 +65,8 @@ class Git {
   }
 
   stat (commit = 'master') {
-    const ls = spawn('git', ['--no-pager', 'ls-tree', '--name-only', '-r', commit], this.processOptions)
-    const cat = spawn('xargs', ['-I', '{}', 'git', '--no-pager', 'show', `${commit}:{}`], this.processOptions)
+    const ls = spawn('git', ['grep', '-Il', '--name-only', '\'\'', commit], this.processOptions)
+    const cat = spawn('xargs', ['git', '--no-pager', 'show'], this.processOptions)
     ls.stdout.pipe(cat.stdin)
     const stats = {}
     return new Promise((resolve, reject) => {
