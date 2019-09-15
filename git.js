@@ -1,9 +1,10 @@
 const fs = require('fs')
 const path = require('path')
-const exec = require('await-exec')
-const spawn = require('child_process').spawn
+const childProcess = require('child_process')
+const spawn = childProcess.spawn
 const rimraf = require('rimraf')
 const util = require('util')
+const asyncExecFile = util.promisify(childProcess.execFile)
 
 class Git {
   constructor (pathToRepo) {
@@ -14,15 +15,15 @@ class Git {
   }
 
   async getCommits (startCommit = 'master', limit = null) {
-    let cmd
+    const args = ['rev-list', '--oneline', '--timestamp']
 
     if (limit) {
-      cmd = `git rev-list --oneline --timestamp --max-count=${limit} ${startCommit}`
-    } else {
-      cmd = `git rev-list --oneline --timestamp ${startCommit}`
+      args.push(`--max-count=${limit}`)
     }
 
-    const data = await exec(cmd, this.processOptions)
+    args.push(startCommit)
+
+    const data = await asyncExecFile('git', args, this.processOptions)
 
     return data.stdout.split(/\r?\n/)
       .map(line => {
@@ -40,7 +41,7 @@ class Git {
   }
 
   async getDiff (commit = 'master') {
-    const result = await exec(`git --no-pager show ${commit}`, this.processOptions)
+    const result = await asyncExecFile('git', ['--no-pager', 'show', commit], this.processOptions)
     return result.stdout.toString()
   }
 
@@ -48,12 +49,12 @@ class Git {
     return spawn('git', ['show', commit + ':' + path], this.processOptions)
   }
 
-  async scanDir ({ path: directory = '', commit = 'master' }) {
+  async scanDir ({ path: directory = '.', commit = 'master' }) {
     let dir = directory
     if (dir && !dir.endsWith('/')) {
       dir += '/'
     }
-    const result = await exec(`git ls-tree --name-only ${commit} ${dir}`, this.processOptions)
+    const result = await asyncExecFile('git', ['ls-tree', '--name-only', commit, dir], this.processOptions)
     return result.stdout
       .split(/\r?\n/)
       .filter(v => v !== '')
@@ -93,7 +94,7 @@ class Git {
       throw new Error('Cannot open directory')
     }
 
-    await exec(`git clone -q ${url} ${repoName}`, {
+    await asyncExecFile('git', ['clone', '-q', url, repoName], {
       cwd: parentDirectory
     })
     // const cloneProcess = spawn(
