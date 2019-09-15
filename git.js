@@ -82,51 +82,26 @@ class Git {
           }
         }
       })
+
+      ls.stderr.on('data', (data) => reject(data.toString()))
       cat.stderr.on('data', (data) => reject(data.toString()))
       cat.on('close', () => resolve(stats))
     })
   }
 
-  static async downloadRepository (url, pathToParent, repoName) {
+  static async downloadRepository (repoUrl, pathToParent, repoName) {
     const parentDirectory = path.resolve(pathToParent)
 
     if (!fs.existsSync(pathToParent)) {
       throw new Error('Cannot open directory')
     }
 
-    await asyncExecFile('git', ['clone', '-q', url, repoName], {
-      cwd: parentDirectory
+    await asyncExecFile('git', ['clone', '-q', repoUrl, repoName], {
+      cwd: parentDirectory,
+      env: {
+        'GIT_TERMINAL_PROMPT': 0
+      }
     })
-    // const cloneProcess = spawn(
-    //   'git', ['clone', '-q', url, repoName], {
-    //     cwd: parentDirectory
-    //   }
-    // )
-
-    // const wait = () => new Promise((resolve, reject) => {
-    //   cloneProcess.stdout.on('data', (data) => {
-    //     if (data) {
-    //       reject(new Error(data.toString()))
-    //       cloneProcess.kill('SIGTERM')
-    //     }
-    //   })
-    //
-    //   cloneProcess.stdin.on('data', (data) => {
-    //     console.log(data)
-    //   })
-    //
-    //   cloneProcess.stderr.on('data', (data) => {
-    //     if (data) {
-    //       reject(new Error(data.toString()))
-    //     }
-    //   })
-    //
-    //   cloneProcess.on('close', () => {
-    //     resolve()
-    //   })
-    // })
-    //
-    // await wait()
 
     return new this(path.resolve(parentDirectory, repoName))
   }
