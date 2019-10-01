@@ -49,16 +49,42 @@ class Git {
     return spawn('git', ['show', commit + ':' + path], this.processOptions)
   }
 
+  async getFilesystemObjectInfo (path, commit = 'master') {
+    const fileRaw = await asyncExecFile('git', ['log', '-1', '--oneline', '--format=%h%n%cn%n%ct%n%s', commit, path])
+    const fileData = fileRaw
+      .stdout
+      .split(/\r?\n/)
+    return {
+      path,
+      commitHash: fileData[0],
+      committer: fileData[1],
+      timestamp: fileData[2],
+      commitSubject: fileData[3]
+    }
+  }
+
   async scanDir ({ path: directory = '.', commit = 'master' }) {
     let dir = directory
     if (dir && !dir.endsWith('/')) {
       dir += '/'
     }
-    const result = await asyncExecFile('git', ['ls-tree', '--name-only', commit, dir], this.processOptions)
-    return result.stdout
+    const files = await asyncExecFile('git', ['ls-tree', commit, dir], this.processOptions)
+    const resultPromises = files.stdout
       .split(/\r?\n/)
       .filter(v => v !== '')
-      .map(file => path.basename(file))
+      .map(row => new Promise(async resolve => {
+        const [additionalRow, file] = row.split('\t')
+        const additionalData = additionalRow.split(' ')
+        const filesystemObjectInfo = await this.getFilesystemObjectInfo(file, commit)
+
+        resolve({
+          ...filesystemObjectInfo,
+          name: path.basename(file),
+          type: additionalData[1] === 'tree' ? 'dir' : 'file'
+        })
+      }))
+
+    return await Promise.all(resultPromises)
   }
 
   async delete () {
