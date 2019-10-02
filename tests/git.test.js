@@ -154,14 +154,34 @@ describe('scanDir', () => {
 
     let items = await repo.scanDir({ commit: '812dcf0' })
 
-    expect(items).toEqual(['README.md'])
+    expect(items).toEqual([
+      {
+        'path': 'README.md',
+        'commitHash': '812dcf0',
+        'committer': 'vail',
+        'timestamp': '1568242431',
+        'commitSubject': 'initial commit',
+        'name': 'README.md',
+        'type': 'file'
+      }
+    ])
 
     items = await repo.scanDir({
       commit: '8b6b3cc',
       path: 'tests'
     })
 
-    expect(items).toEqual(['git.test.js'])
+    expect(items).toEqual([
+      {
+        'path': 'tests/git.test.js',
+        'commitHash': '124bdb4',
+        'committer': 'vail',
+        'timestamp': '1568467216',
+        'commitSubject': 'Add some tests',
+        'name': 'git.test.js',
+        'type': 'file'
+      }
+    ])
 
     await tmpDir.cleanup()
   })
