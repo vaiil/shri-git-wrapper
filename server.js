@@ -2,6 +2,7 @@ const express = require('express')
 const path = require('path')
 const minimist = require('minimist')
 const getDirs = require('./get-dirs')
+const cors = require('cors')
 
 require('dotenv').config()
 const Git = require('./git')
@@ -20,6 +21,7 @@ console.log('Repos dir: ' + reposDir)
 
 const app = express()
 
+app.use(cors())
 app.use(express.json())
 
 function jsonProxyRequest (handle) {
@@ -110,7 +112,6 @@ app.get(
     }
   })
 )
-
 
 app.get(
   '/api/repos/:repo/stat/:commit?',
