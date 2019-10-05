@@ -7,6 +7,7 @@ require('dotenv').config()
 const Git = require('./git')
 
 let reposDir = process.env.GIT_REPO_DIR
+let port = process.env.PORT || 3000
 
 const argv = minimist(process.argv)
 if (argv.path) {
@@ -121,4 +122,4 @@ app.delete(
   jsonProxyRequest(async (req) => await req.repo.delete())
 )
 
-app.listen(3000)
+app.listen(port)
