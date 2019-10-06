@@ -35,7 +35,7 @@ function jsonProxyRequest (handle) {
       res.json(await handle(req, res))
     } catch (e) {
       res.status(400)
-      res.json(e)
+      res.json({ message: e.stderr })
     }
   }
 }
