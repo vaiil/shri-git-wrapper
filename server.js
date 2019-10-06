@@ -11,8 +11,13 @@ let reposDir = process.env.GIT_REPO_DIR
 let port = process.env.PORT || 3000
 
 const argv = minimist(process.argv)
+
 if (argv.path) {
   reposDir = argv.path
+}
+
+if (argv.port) {
+  port = argv.port
 }
 
 reposDir = path.resolve(reposDir)
