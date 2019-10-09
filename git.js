@@ -50,7 +50,7 @@ class Git {
   }
 
   async getFilesystemObjectInfo (path, commit = 'master') {
-    const fileRaw = await asyncExecFile('git', ['log', '-1', '--oneline', '--format=%h%n%cn%n%ct%n%s', commit, path], this.processOptions)
+    const fileRaw = await asyncExecFile('git', ['log', '-1', '--oneline', '--format=%h%n%cn%n%ct%n%s', commit, '--',  path], this.processOptions)
     const fileData = fileRaw
       .stdout
       .split(/\r?\n/)
