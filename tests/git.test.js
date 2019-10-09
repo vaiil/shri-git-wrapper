@@ -94,7 +94,7 @@ describe('getCommits', () => {
 })
 
 describe('getDiff', () => {
-  it('This repo', async () => {
+  it('can get diff of existing branches/commits', async () => {
     const tmpDir = await dir({ unsafeCleanup: true })
 
     const repo = await downloadThisRepo(tmpDir.path)
@@ -102,18 +102,23 @@ describe('getDiff', () => {
     // It shouldn't fail
     expect(typeof await repo.getDiff('975f365')).toEqual('string') // Get second commit
     expect(typeof await repo.getDiff('812dcf0')).toEqual('string') // Get first commit
-    expect(typeof await repo.getDiff()).toEqual('string') // Try get diff of HEAD commit
+    expect(typeof await repo.getDiff()).toEqual('string') // Get diff of master
     expect(typeof await repo.getDiff('master')).toEqual('string') // Try get diff of master
 
     await tmpDir.cleanup()
   })
 
-  it('Error testing', async () => {
+  it('throw error when branch doesnt exists', async () => {
     const tmpDir = await dir({ unsafeCleanup: true })
 
     const repo = await downloadThisRepo(tmpDir.path)
-
     await expect(repo.getDiff('wrong-branch')).rejects.toThrow() // Wrong branch
+  })
+
+  it('throw error when branch doesnt ambiguous', async () => {
+    const tmpDir = await dir({ unsafeCleanup: true })
+
+    const repo = await downloadThisRepo(tmpDir.path)
     await expect(repo.getDiff('4')).rejects.toThrow() // Ambiguous ref
 
     await tmpDir.cleanup()
@@ -121,7 +126,7 @@ describe('getDiff', () => {
 })
 
 describe('getBlobReader', () => {
-  it('This repo - README', async () => {
+  it('read README', async () => {
     const tmpDir = await dir({ unsafeCleanup: true })
 
     const repo = await downloadThisRepo(tmpDir.path)
@@ -147,12 +152,12 @@ describe('getBlobReader', () => {
 })
 
 describe('scanDir', () => {
-  it('This repo', async () => {
+  it('without path', async () => {
     const tmpDir = await dir({ unsafeCleanup: true })
 
     const repo = await downloadThisRepo(tmpDir.path)
 
-    let items = await repo.scanDir({ commit: '812dcf0' })
+    const items = await repo.scanDir({ commit: '812dcf0' })
 
     expect(items).toEqual([
       {
@@ -165,8 +170,14 @@ describe('scanDir', () => {
         'type': 'file'
       }
     ])
+  })
 
-    items = await repo.scanDir({
+  it('with path', async () => {
+    const tmpDir = await dir({ unsafeCleanup: true })
+
+    const repo = await downloadThisRepo(tmpDir.path)
+
+    const items = await repo.scanDir({
       commit: '8b6b3cc',
       path: 'tests'
     })
@@ -182,6 +193,21 @@ describe('scanDir', () => {
         'type': 'file'
       }
     ])
+
+    await tmpDir.cleanup()
+  })
+
+  it('with wrong path', async () => {
+    const tmpDir = await dir({ unsafeCleanup: true })
+
+    const repo = await downloadThisRepo(tmpDir.path)
+
+    const items = await repo.scanDir({
+      commit: '8b6b3cc',
+      path: 'testssss'
+    })
+
+    expect(items).toEqual([])
 
     await tmpDir.cleanup()
   })
