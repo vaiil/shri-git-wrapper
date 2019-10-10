@@ -8,16 +8,24 @@
     "moduleResolution": "node",
     "allowJs": false,
     "noUnusedLocals": true,
-    "strictNullChecks": true,
-    "noImplicitAny": true,
-    "noImplicitThis": true,
     "experimentalDecorators": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "removeComments": false,
-    "lib": ["esnext"],
-    "types": ["jest", "node", "rimraf", "express", "minimist", "cors", "dotenv"],
-    "rootDir": "."
+    "lib": [
+      "esnext"
+    ],
+    "types": [
+      "jest",
+      "node",
+      "rimraf",
+      "express",
+      "minimist",
+      "cors",
+      "dotenv"
+    ],
+    "rootDir": ".",
+//    "strict": true
   },
   "include": [
     "get-dirs.ts",

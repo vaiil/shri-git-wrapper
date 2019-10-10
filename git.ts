@@ -7,6 +7,12 @@ import rimraf from 'rimraf'
 const spawn = childProcess.spawn
 const asyncExecFile = util.promisify(childProcess.execFile)
 
+export interface Commit {
+  date: Date;
+  ref: string;
+  message: string
+}
+
 export class Git {
   readonly path: string
   readonly processOptions: childProcess.ProcessEnvOptions
@@ -21,7 +27,7 @@ export class Git {
   async getCommits(
     startCommit = 'master',
     limit = 0
-  ): Promise<Array<{ date: Date; ref: string; message: string }>> {
+  ): Promise<Array<Commit>> {
     const args = ['rev-list', '--oneline', '--timestamp']
 
     if (limit) {
@@ -35,9 +41,9 @@ export class Git {
     return data.stdout
       .split(/\r?\n/)
       .map(line => {
-        return line.match(/^(\d*) (\w*) (.*)$/)!
+        return line.match(/^(\d*) (\w*) (.*)$/)
       })
-      .filter(parsed => parsed && parsed.length === 4)
+      .filter((parsed): parsed is Array<string> => parsed !== null && parsed.length === 4)
       .map(([, timestamp, ref, message]) => {
         return {
           date: new Date(parseInt(timestamp) * 1000),

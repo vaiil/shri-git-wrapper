@@ -1,5 +1,5 @@
 import path from 'path'
-import express, * as ExpressTypes from 'express'
+import expressApp, * as express from 'express'
 import minimist from 'minimist'
 import cors from 'cors'
 import process from 'process'
@@ -9,10 +9,6 @@ import getDirs from './get-dirs'
 import { config } from 'dotenv'
 
 import { Git } from './git'
-
-interface Request extends ExpressTypes.Request {
-  repo: Git
-}
 
 config()
 
@@ -38,34 +34,25 @@ const reposPath = path.resolve(reposDir!)
 
 console.log('Repos dir: ' + reposPath)
 
-const app = express()
+const app = expressApp()
 
 app.use(cors())
 app.use(express.json())
 
-function jsonProxyRequest(
-  handle: ExpressTypes.RequestHandler
-): ExpressTypes.RequestHandler {
-  return async (req, res, next) => {
-    try {
-      res.json(await handle(req, res, next))
-    } catch (e) {
-      res.status(400)
-      res.json({ message: e.stderr })
-    }
+app.use(async (req, res, next) => {
+  try {
+    res.json(await next(req))
+  } catch (e) {
+    res.status(400)
+    res.json({ message: e.stderr })
   }
-}
+})
 
-app.get(
-  '/api/repos',
-  jsonProxyRequest(async () => {
-    return await getDirs(reposPath)
-  })
-)
+app.get('/api/repos', async () => await getDirs(reposPath))
 
 app.post(
   '/api/repos/:repo',
-  jsonProxyRequest(async req => {
+  async (req) => {
     await Git.downloadRepository(
       req.body['repo-url'],
       reposPath,
@@ -74,40 +61,34 @@ app.post(
     return {
       status: 'success'
     }
-  })
+  }
 )
 
-app.use('/api/repos/:repo', (req: Request, res, next) => {
+app.use('/api/repos/:repo', (req, res, next) => {
   req.repo = new Git(path.resolve(reposPath, req.params.repo))
   next()
 })
 
 app.get(
   '/api/repos/:repo/commits/:commit?',
-  jsonProxyRequest(
-    async (req: Request) => await req.repo.getCommits(req.params.commit)
-  )
+  async (req) => await req.repo.getCommits(req.params.commit)
 )
 
 app.get(
   '/api/repos/:repo/commits/:commit/diff',
-  jsonProxyRequest(
-    async (req: Request) => await req.repo.getDiff(req.params.commit)
-  )
+  async (req) => await req.repo.getDiff(req.params.commit)
 )
 
 app.get(
   ['/api/repos/:repo', '/api/repos/:repo/tree/:commit?/:path([^/]*)?'],
-  jsonProxyRequest(
-    async (req: Request) =>
-      await req.repo.scanDir({
-        path: req.params.path,
-        commit: req.params.commit
-      })
-  )
+  async (req) =>
+    await req.repo.scanDir({
+      path: req.params.path,
+      commit: req.params.commit
+    })
 )
 
-app.get('/api/repos/:repo/blob/:commit/:path([^/]*)', (req: Request, res) => {
+app.get('/api/repos/:repo/blob/:commit/:path([^/]*)', (req, res) => {
   const blobReader = req.repo.getBlobReader(req.params.path, req.params.commit)
   blobReader.stdout.on('data', data => res.write(data))
   blobReader.stderr.on('data', data => {
@@ -119,7 +100,7 @@ app.get('/api/repos/:repo/blob/:commit/:path([^/]*)', (req: Request, res) => {
 
 app.get(
   '/api/repos/:repo/paginate-commits/:limit/:commit?',
-  jsonProxyRequest(async (req: Request) => {
+  async (req) => {
     const limit = parseInt(req.params.limit)
     const items = await req.repo.getCommits(req.params.commit, limit + 1)
     const lastItem = items.pop()
@@ -139,17 +120,17 @@ app.get(
         next: null
       }
     }
-  })
+  }
 )
 
 app.get(
   '/api/repos/:repo/stat/:commit?',
-  jsonProxyRequest(async (req: Request) => await req.repo.stat(req.params.commit))
+  async (req) => await req.repo.stat(req.params.commit)
 )
 
 app.delete(
   '/api/repos/:repo',
-  jsonProxyRequest(async (req: Request) => await req.repo.delete())
+  async (req) => await req.repo.delete()
 )
 
 app.listen(port)
