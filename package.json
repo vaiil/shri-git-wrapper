@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@types/node": "^12.7.12",
+    "@types/rimraf": "^2.0.2",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dotenv": "^8.1.0",

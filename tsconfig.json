@@ -16,10 +16,11 @@
     "esModuleInterop": true,
     "removeComments": false,
     "lib": ["esnext"],
-    "types": ["jest", "node"],
+    "types": ["jest", "node", "rimraf"],
     "rootDir": "."
   },
   "include": [
-    "get-dirs.ts"
+    "get-dirs.ts",
+    "git.ts"
   ]
 }
