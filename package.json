@@ -13,7 +13,8 @@
     "@types/jest": "^24.0.18",
     "jest": "^24.9.0",
     "tmp": "^0.1.0",
-    "tmp-promise": "^2.0.2"
+    "tmp-promise": "^2.0.2",
+    "ts-jest": "^24.1.0"
   },
   "dependencies": {
     "body-parser": "^1.19.0",
@@ -21,6 +22,8 @@
     "dotenv": "^8.1.0",
     "express": "^4.17.1",
     "minimist": "^1.2.0",
-    "rimraf": "^3.0.0"
+    "rimraf": "^3.0.0",
+    "ts-node": "^8.4.1",
+    "typescript": "^3.6.4"
   }
 }
