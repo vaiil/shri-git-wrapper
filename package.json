@@ -5,18 +5,20 @@
   "main": "server.js",
   "scripts": {
     "test": "jest",
-    "server": "node server.js"
+    "server": "ts-node server.js"
   },
   "author": "vaiil",
   "license": "ISC",
   "devDependencies": {
     "@types/jest": "^24.0.18",
     "jest": "^24.9.0",
+    "prettier": "^1.18.2",
     "tmp": "^0.1.0",
     "tmp-promise": "^2.0.2",
     "ts-jest": "^24.1.0"
   },
   "dependencies": {
+    "@types/node": "^12.7.12",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dotenv": "^8.1.0",
