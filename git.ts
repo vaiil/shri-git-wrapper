@@ -7,7 +7,7 @@ import rimraf from 'rimraf'
 const spawn = childProcess.spawn
 const asyncExecFile = util.promisify(childProcess.execFile)
 
-class Git {
+export class Git {
   readonly path: string
   readonly processOptions: childProcess.ProcessEnvOptions
 
@@ -18,7 +18,10 @@ class Git {
     }
   }
 
-  async getCommits(startCommit = 'master', limit = null) {
+  async getCommits(
+    startCommit = 'master',
+    limit = 0
+  ): Promise<Array<{ date: Date; ref: string; message: string }>> {
     const args = ['rev-list', '--oneline', '--timestamp']
 
     if (limit) {
@@ -32,17 +35,17 @@ class Git {
     return data.stdout
       .split(/\r?\n/)
       .map(line => {
-        const parsed = line.match(/^(\d*) (\w*) (.*)$/)
-        if (!parsed || parsed.length !== 4) {
-          return null
-        }
+        return line.match(/^(\d*) (\w*) (.*)$/)!
+      })
+      .filter(parsed => parsed && parsed.length === 4)
+      .map(([, timestamp, ref, message]) => {
         return {
-          date: new Date(parseInt(parsed[1]) * 1000),
-          ref: parsed[2],
-          message: parsed[3]
+          date: new Date(parseInt(timestamp) * 1000),
+          ref,
+          message
         }
       })
-      .filter(v => v !== null)
+
   }
 
   async getDiff(commit = 'master') {
@@ -176,5 +179,3 @@ class Git {
     return new this(path.resolve(parentDirectory, repoName))
   }
 }
-
-module.exports = Git

@@ -16,11 +16,12 @@
     "esModuleInterop": true,
     "removeComments": false,
     "lib": ["esnext"],
-    "types": ["jest", "node", "rimraf"],
+    "types": ["jest", "node", "rimraf", "express", "minimist", "cors", "dotenv"],
     "rootDir": "."
   },
   "include": [
     "get-dirs.ts",
-    "git.ts"
+    "git.ts",
+    "server.ts"
   ]
 }
