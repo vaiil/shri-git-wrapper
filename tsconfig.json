@@ -1,35 +1,27 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
+    "rootDir": ".",
     "outDir": "dist",
     "sourceMap": false,
     "target": "esnext",
     "module": "esnext",
     "moduleResolution": "node",
-    "allowJs": false,
-    "noUnusedLocals": true,
-    "experimentalDecorators": true,
-    "resolveJsonModule": true,
     "esModuleInterop": true,
     "removeComments": false,
+    "allowSyntheticDefaultImports": true,
     "lib": [
       "esnext"
     ],
-    "types": [
-      "jest",
-      "node",
-      "rimraf",
-      "express",
-      "minimist",
-      "cors",
-      "dotenv"
+    "typeRoots": [
+      "./node_modules/@types"
     ],
-    "rootDir": ".",
-//    "strict": true
+    "strict": true
   },
   "include": [
-    "get-dirs.ts",
-    "git.ts",
-    "server.ts"
+    "extension/**/*.ts",
+    "src/get-dirs.ts",
+    "src/git.ts",
+    "src/index.ts"
   ]
 }

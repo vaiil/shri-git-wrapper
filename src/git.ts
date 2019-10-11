@@ -1,7 +1,7 @@
-import * as childProcess from 'child_process'
-import * as fs from 'fs'
-import * as path from 'path'
-import * as util from 'util'
+import childProcess from 'child_process'
+import fs from 'fs'
+import path from 'path'
+import util from 'util'
 import rimraf from 'rimraf'
 
 const spawn = childProcess.spawn
@@ -13,7 +13,7 @@ export interface Commit {
   message: string
 }
 
-export class Git {
+export default class Git {
   readonly path: string
   readonly processOptions: childProcess.ProcessEnvOptions
 

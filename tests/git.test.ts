@@ -1,5 +1,5 @@
-import getDirs from '../get-dirs'
-import { Git, Commit } from '../git'
+import getDirs from '../src/get-dirs'
+import Git, { Commit } from '../src/git'
 import { dir } from 'tmp-promise'
 
 async function downloadThisRepo(parentDir: string) {

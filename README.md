@@ -4,7 +4,7 @@ Node.js Обертка для Git
 
 Для запуска сервера:
 ```shell script
-ts-node server.ts --path PATH-TO-REPO 
+ts-node index.ts --path PATH-TO-REPO 
 ```
 Также можно запустить без параметра и тогда путь к папке будет искаться в .env
 

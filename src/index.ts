@@ -1,5 +1,5 @@
 import path from 'path'
-import expressApp, * as express from 'express'
+import express from 'express'
 import minimist from 'minimist'
 import cors from 'cors'
 import process from 'process'
@@ -8,7 +8,7 @@ import getDirs from './get-dirs'
 
 import { config } from 'dotenv'
 
-import { Git } from './git'
+import Git from './git'
 
 config()
 
@@ -34,7 +34,7 @@ const reposPath = path.resolve(reposDir!)
 
 console.log('Repos dir: ' + reposPath)
 
-const app = expressApp()
+const app = express()
 
 app.use(cors())
 app.use(express.json())
