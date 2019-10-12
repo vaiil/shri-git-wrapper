@@ -41,14 +41,16 @@ app.use(express.json())
 
 app.use(async (req, res, next) => {
   try {
-    res.json(await next(req))
+    await next()
   } catch (e) {
     res.status(400)
     res.json({ message: e.stderr })
   }
 })
 
-app.get('/api/repos', async () => await getDirs(reposPath))
+app.get('/api/repos', async (req, res) => {
+  res.json(await getDirs(reposPath))
+})
 
 app.post(
   '/api/repos/:repo',

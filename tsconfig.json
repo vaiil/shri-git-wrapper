@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "rootDir": ".",
+    "rootDir": "./src",
     "outDir": "dist",
     "sourceMap": false,
-    "target": "esnext",
-    "module": "esnext",
+    "target": "es2017",
+    "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "removeComments": false,
@@ -14,14 +14,17 @@
       "esnext"
     ],
     "typeRoots": [
+      "./@types",
       "./node_modules/@types"
     ],
-    "strict": true
+    "strict": true,
+    "noImplicitAny": true
   },
   "include": [
-    "extension/**/*.ts",
-    "src/get-dirs.ts",
-    "src/git.ts",
-    "src/index.ts"
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
   ]
 }
