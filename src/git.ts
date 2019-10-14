@@ -104,22 +104,21 @@ export default class Git {
     const resultPromises = files.stdout
       .split(/\r?\n/)
       .filter(v => v !== '')
-      .map(
-        row =>
-          new Promise(async resolve => {
-            const [additionalRow, file] = row.split('\t')
-            const additionalData = additionalRow.split(' ')
-            const filesystemObjectInfo = await this.getFilesystemObjectInfo(
-              file,
-              commit
-            )
+      .map(async row => {
 
-            resolve({
-              ...filesystemObjectInfo,
-              name: path.basename(file),
-              type: additionalData[1] === 'tree' ? 'dir' : 'file'
-            })
-          })
+          const [additionalRow, file] = row.split('\t')
+          const additionalData = additionalRow.split(' ')
+          const filesystemObjectInfo = await this.getFilesystemObjectInfo(
+            file,
+            commit
+          )
+
+          return {
+            ...filesystemObjectInfo,
+            name: path.basename(file),
+            type: additionalData[1] === 'tree' ? 'dir' : 'file'
+          }
+        }
       )
 
     return await Promise.all(resultPromises)

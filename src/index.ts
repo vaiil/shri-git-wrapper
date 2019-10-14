@@ -54,15 +54,17 @@ app.get('/api/repos', async (req, res) => {
 
 app.post(
   '/api/repos/:repo',
-  async (req) => {
+  async (req, res) => {
     await Git.downloadRepository(
       req.body['repo-url'],
       reposPath,
       req.params.repo
     )
-    return {
-      status: 'success'
-    }
+    return res.json(
+      {
+        status: 'success'
+      }
+    )
   }
 )
 
@@ -73,21 +75,23 @@ app.use('/api/repos/:repo', (req, res, next) => {
 
 app.get(
   '/api/repos/:repo/commits/:commit?',
-  async (req) => await req.repo.getCommits(req.params.commit)
+  async (req, res) => await res.json(req.repo.getCommits(req.params.commit))
 )
 
 app.get(
   '/api/repos/:repo/commits/:commit/diff',
-  async (req) => await req.repo.getDiff(req.params.commit)
+  async (req, res) => await res.json(req.repo.getDiff(req.params.commit))
 )
 
 app.get(
   ['/api/repos/:repo', '/api/repos/:repo/tree/:commit?/:path([^/]*)?'],
-  async (req) =>
-    await req.repo.scanDir({
-      path: req.params.path,
-      commit: req.params.commit
-    })
+  async (req, res) =>
+    res.json(
+      await req.repo.scanDir({
+        path: req.params.path,
+        commit: req.params.commit
+      })
+    )
 )
 
 app.get('/api/repos/:repo/blob/:commit/:path([^/]*)', (req, res) => {
@@ -102,7 +106,7 @@ app.get('/api/repos/:repo/blob/:commit/:path([^/]*)', (req, res) => {
 
 app.get(
   '/api/repos/:repo/paginate-commits/:limit/:commit?',
-  async (req) => {
+  async (req, res) => {
     const limit = parseInt(req.params.limit)
     const items = await req.repo.getCommits(req.params.commit, limit + 1)
     const lastItem = items.pop()
@@ -112,27 +116,31 @@ app.get(
         '://' +
         req.get('host') +
         `/api/repos/${req.params.repo}/paginate-commits/${req.params.limit}/${lastItem!.ref}`
-      return {
-        items: items,
-        next: url
-      }
+      res.json(
+        {
+          items: items,
+          next: url
+        }
+      )
     } else {
-      return {
-        items: items,
-        next: null
-      }
+      res.json(
+        {
+          items: items,
+          next: null
+        }
+      )
     }
   }
 )
 
 app.get(
   '/api/repos/:repo/stat/:commit?',
-  async (req) => await req.repo.stat(req.params.commit)
+  async (req, res) => await res.json(req.repo.stat(req.params.commit))
 )
 
 app.delete(
   '/api/repos/:repo',
-  async (req) => await req.repo.delete()
+  async (req, res) => await res.json(req.repo.delete())
 )
 
 app.listen(port)
