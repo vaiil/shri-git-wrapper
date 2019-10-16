@@ -2,25 +2,35 @@
   "name": "git-wrapper",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "src/index.ts",
   "scripts": {
     "test": "jest",
-    "server": "node server.js"
+    "server": "ts-node --files src/index.ts"
   },
   "author": "vaiil",
   "license": "ISC",
   "devDependencies": {
-    "@types/jest": "^24.0.18",
     "jest": "^24.9.0",
+    "prettier": "^1.18.2",
     "tmp": "^0.1.0",
-    "tmp-promise": "^2.0.2"
+    "tmp-promise": "^2.0.2",
+    "ts-jest": "^24.1.0",
+    "@types/jest": "^24.0.18"
   },
   "dependencies": {
+    "@types/cors": "^2.8.6",
+    "@types/dotenv": "^6.1.1",
+    "@types/express": "^4.17.1",
+    "@types/minimist": "^1.2.0",
+    "@types/node": "^12.7.12",
+    "@types/rimraf": "^2.0.2",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dotenv": "^8.1.0",
     "express": "^4.17.1",
     "minimist": "^1.2.0",
-    "rimraf": "^3.0.0"
+    "rimraf": "^3.0.0",
+    "ts-node": "^8.4.1",
+    "typescript": "^3.6.4"
   }
 }

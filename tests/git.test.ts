@@ -1,8 +1,8 @@
-const Git = require('../git')
-const dir = require('tmp-promise').dir
-const getDirs = require('../get-dirs')
+import getDirs from '../src/get-dirs'
+import Git, { Commit } from '../src/git'
+import { dir } from 'tmp-promise'
 
-async function downloadThisRepo (parentDir) {
+async function downloadThisRepo(parentDir: string) {
   return await Git.downloadRepository('git@github.com:vaiil/shri-git-wrapper.git', parentDir, 'test')
 }
 
@@ -25,7 +25,7 @@ describe('downloadRepository', () => {
 })
 
 describe('getCommits', () => {
-  function expectSameCommit (commit, example) {
+  function expectSameCommit(commit: Commit, example: Commit) {
     expect(commit.date).toEqual(example.date)
     expect(commit.message).toEqual(example.message)
     expect(example.ref.startsWith(commit.ref)).toBeTruthy()
